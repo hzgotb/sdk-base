@@ -17,8 +17,8 @@ export abstract class Base<T = any, O extends BaseOptions<T> = BaseOptions<T>> e
   options: O;
   #closed = false;
   #localStorage: AsyncLocalStorage<T>;
-  /* @ts-expect-error just a placeholder, will be implemented in subclass */
-  protected _close(): Promise<void>;
+  /* just a method signature, will be implemented in subclass */
+  protected _close?(): Promise<void>;
   constructor(options?: O) {
     super();
 
@@ -100,13 +100,12 @@ export abstract class Base<T = any, O extends BaseOptions<T> = BaseOptions<T>> e
       return;
     }
     this.#closed = true;
-    const closeMethod = Reflect.get(this, '_close') as () => Promise<void>;
-    if (typeof closeMethod !== 'function') {
+    if (typeof this._close !== 'function') {
       return;
     }
 
     try {
-      await closeMethod.apply(this);
+      await this._close();
     } catch (err) {
       this.emit('error', err);
     }
