@@ -13,13 +13,13 @@ export interface BaseOptions<T = any> {
   [key: string]: any;
 }
 
-export abstract class Base<T = any> extends ReadyEventEmitter {
-  options: BaseOptions<T>;
+export abstract class Base<T = any, O extends BaseOptions<T> = BaseOptions<T>> extends ReadyEventEmitter {
+  options: O;
   #closed = false;
   #localStorage: AsyncLocalStorage<T>;
   /* @ts-expect-error just a placeholder, will be implemented in subclass */
   protected _close(): Promise<void>;
-  constructor(options?: BaseOptions<T>) {
+  constructor(options?: O) {
     super();
 
     if (options?.initMethod) {
@@ -44,7 +44,7 @@ export abstract class Base<T = any> extends ReadyEventEmitter {
         });
       });
     }
-    this.options = options ?? {};
+    this.options = options ?? ({} as O);
     this.#localStorage = this.options.localStorage ?? getAsyncLocalStorage<T>();
     super.on('error', err => {
       this._defaultErrorHandler(err);
