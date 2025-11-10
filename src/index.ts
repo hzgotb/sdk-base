@@ -17,7 +17,8 @@ export abstract class Base<T = any> extends ReadyEventEmitter {
   options: BaseOptions<T>;
   #closed = false;
   #localStorage: AsyncLocalStorage<T>;
-
+  /* @ts-expect-error just a placeholder, will be implemented in subclass */
+  protected _close(): Promise<void>;
   constructor(options?: BaseOptions<T>) {
     super();
 
